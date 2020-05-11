@@ -1,0 +1,14 @@
+{
+  "access_key": "",
+  "secret_key": "",
+  "cron": "* 4 * * *",
+  "timezone": "Asia/Shanghai",
+  "certs": [
+    {
+      "domain": "",
+      "name": "",
+      "crt_path": "",
+      "key_path": ""
+    }
+  ]
+}
