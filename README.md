@@ -8,16 +8,16 @@
 
 ```json
 {
-  "access_key": "",
-  "secret_key": "",
+  "access_key": "xxx",
+  "secret_key": "xxx",
   "cron": "* 4 * * *",
   "timezone": "Asia/Shanghai",
   "certs": [
     {
-      "domain": "",
-      "name": "",
-      "crt_path": "",
-      "key_path": ""
+      "domain": "52xckl.cn",
+      "name": "52xckl.cn",
+      "crt_path": "/ssl/*.52xckl.cn.crt",
+      "key_path": "/ssl/*.52xckl.cn.key"
     }
   ]
 }
@@ -39,6 +39,7 @@ docker run -d \
     --restart always \
     -e DEBUG=true \
     -v /opt/docker/baidu-su/config.json:/config.json \
+    -v /usr/local/openresty/nginx/conf/ssl:/ssl:ro \
     starudream/baidu-su:latest
 ```
 

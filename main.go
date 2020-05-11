@@ -98,19 +98,19 @@ func do(i int) {
 
 	bsCrt, err := ioutil.ReadFile(cert.CrtPath)
 	if err != nil {
-		exit("[%s:%d] read cert file fail", err)
+		exit("[%s:%d] read cert file fail", err, cert.Name, i)
 		return
 	}
 
 	certBlock, _ := pem.Decode(bsCrt)
 	if certBlock == nil {
-		exit("[%s:%d] check cert format fail", nil)
+		exit("[%s:%d] check cert format fail", nil, cert.Name, i)
 		return
 	}
 
 	c, err := x509.ParseCertificate(certBlock.Bytes)
 	if err != nil {
-		exit("[%s:%d] decode cert file fail", err)
+		exit("[%s:%d] decode cert file fail", err, cert.Name, i)
 		return
 	}
 
@@ -121,7 +121,7 @@ func do(i int) {
 
 	bsKey, err := ioutil.ReadFile(cert.KeyPath)
 	if err != nil {
-		exit("[%s:%d] read key file fail", err)
+		exit("[%s:%d] read key file fail", err, cert.Name, i)
 		return
 	}
 
@@ -135,14 +135,14 @@ func do(i int) {
 		}).
 		Do()
 	if err != nil {
-		exit("[%s:%d] api call fail", err)
+		exit("[%s:%d] api call fail", err, cert.Name, i)
 		return
 	}
 
 	certInfos := []*RespCertInfo{}
 	err = json.Unmarshal(json.MustMarshal(resp.Result), &certInfos)
 	if err != nil {
-		exit("[%s:%d] decode cert info fail", err)
+		exit("[%s:%d] decode cert info fail", err, cert.Name, i)
 		return
 	}
 
@@ -180,7 +180,7 @@ func do(i int) {
 				}).
 				Do()
 			if err != nil {
-				exit("[%s:%d] api call fail", err)
+				exit("[%s:%d] api call fail", err, cert.Name, i)
 				return
 			}
 			logx.Infof("[%s:%d] cert deleted", cert.Name, i)
@@ -197,7 +197,7 @@ func do(i int) {
 			}).
 			Do()
 		if err != nil {
-			exit("[%s:%d] api call fail", err)
+			exit("[%s:%d] api call fail", err, cert.Name, i)
 			return
 		}
 		logx.Infof("[%s:%d] cert added", cert.Name, i)
