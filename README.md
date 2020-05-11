@@ -8,16 +8,16 @@
 
 ```json
 {
-  "tasks": [
+  "access_key": "",
+  "secret_key": "",
+  "cron": "* 4 * * *",
+  "timezone": "Asia/Shanghai",
+  "certs": [
     {
-      "name": "test",
-      "url": "https://api.github.com/",
-      "body": "",
-      "cron": "* * * * *",
-      "timezone": "Asia/Shanghai",
-      "method": "GET",
-      "headers": {},
-      "timeout": 30
+      "domain": "",
+      "name": "",
+      "crt_path": "",
+      "key_path": ""
     }
   ]
 }
