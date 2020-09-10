@@ -17,6 +17,7 @@ import (
 type Config struct {
 	AccessKey string `json:"access_key"`
 	SecretKey string `json:"secret_key"`
+	BDUSS     string `json:"bduss"`
 	Cron      string `json:"cron"`
 	Timezone  string `json:"timezone"`
 	Certs     []Cert `json:"certs"`
@@ -30,6 +31,7 @@ type Cert struct {
 }
 
 type RespCertInfo struct {
+	Id           string    `json:"id"`
 	Info         string    `json:"info"`
 	Issuer       string    `json:"issuer"`
 	HostsContent string    `json:"hosts_content"`
@@ -73,6 +75,10 @@ func init() {
 	schedule, err = cron.ParseStandard(config.Cron)
 	if err != nil {
 		exit("[init] cron parse fail", err)
+	}
+
+	if (config.AccessKey == "" || config.SecretKey == "") && config.BDUSS == "" {
+		exit("[init] access or secret key and bduss is empty", err)
 	}
 
 	logx.Debugf("[init] config: %s", json.MustMarshal(config))
@@ -125,15 +131,14 @@ func do(i int) {
 		return
 	}
 
+	err = client().Init()
+	if err != nil {
+		exit("[%s:%d] client init fail", err, cert.Name, i)
+	}
+
 	logx.Infof("[%s:%d] cert check", cert.Name, i)
 
-	resp, err := client().
-		SetMethod(MethodGet).
-		SetPath("v3/yjs/custom_certificates").
-		SetParams(map[string]string{
-			"domain": cert.Domain,
-		}).
-		Do()
+	resp, err := client().GetCertificates(cert.Domain)
 	if err != nil {
 		exit("[%s:%d] api call fail", err, cert.Name, i)
 		return
@@ -146,7 +151,7 @@ func do(i int) {
 		return
 	}
 
-	renew, exist := false, false
+	renew, exist, id := false, false, ""
 	for _, info := range certInfos {
 		if info.Info == cert.Name {
 			exist = true
@@ -171,14 +176,7 @@ func do(i int) {
 
 	if renew {
 		if exist {
-			resp, err = client().
-				SetMethod(MethodDelete).
-				SetPath("v3/yjs/custom_certificates").
-				SetParams(map[string]string{
-					"domain": cert.Domain,
-					"info":   cert.Name,
-				}).
-				Do()
+			resp, err = client().DeleteCertificates(cert.Domain, id, cert.Name)
 			if err != nil {
 				exit("[%s:%d] api call fail", err, cert.Name, i)
 				return
@@ -186,16 +184,7 @@ func do(i int) {
 			logx.Infof("[%s:%d] cert deleted", cert.Name, i)
 		}
 
-		resp, err = client().
-			SetMethod(MethodPost).
-			SetPath("v3/yjs/custom_certificates").
-			SetParams(map[string]string{
-				"domain":      cert.Domain,
-				"info":        cert.Name,
-				"certificate": string(bsCrt),
-				"private_key": string(bsKey),
-			}).
-			Do()
+		resp, err = client().PostCertificates(cert.Domain, cert.Name, string(bsCrt), string(bsKey))
 		if err != nil {
 			exit("[%s:%d] api call fail", err, cert.Name, i)
 			return
@@ -204,6 +193,12 @@ func do(i int) {
 	}
 }
 
-func client() *Client {
-	return NewClient().SetAccessKey(config.AccessKey).SetSecretKey(config.SecretKey)
+func client() Client {
+	if config.AccessKey != "" && config.SecretKey != "" {
+		return NewClient().SetAccessKey(config.AccessKey).SetSecretKey(config.SecretKey)
+	} else if config.BDUSS != "" {
+		return NewClientRaw().SetBDUSS(config.BDUSS)
+	} else {
+		return nil
+	}
 }
