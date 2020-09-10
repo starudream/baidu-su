@@ -10,6 +10,7 @@
 {
   "access_key": "xxx",
   "secret_key": "xxx",
+  "bduss": "xxx",
   "cron": "* 4 * * *",
   "timezone": "Asia/Shanghai",
   "certs": [
