@@ -3,8 +3,8 @@ on:
   - push
 env:
   USERNAME: starudream
-  DOCKER_TOKEN: ${{secrets.DOCKER_TOKEN}}
-  PACKAGE_TOKEN: ${{secrets.PACKAGE_TOKEN}}
+  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
 jobs:
   build:
     name: Build
