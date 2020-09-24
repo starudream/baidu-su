@@ -1,4 +1,4 @@
-module github.com/starudream/baidusu
+module github.com/starudream/baidu-su
 
 go 1.15
 

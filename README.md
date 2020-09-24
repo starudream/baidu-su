@@ -1,8 +1,8 @@
 # Baidu-Su
 
-![Go](https://github.com/starudream/baidu-su/workflows/Go/badge.svg)
-![Docker](https://github.com/starudream/baidu-su/workflows/Docker/badge.svg)
-![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue)
+![Go](https://img.shields.io/github/workflow/status/starudream/baidu-su/Go/master?style=for-the-badge)
+![Docker](https://img.shields.io/github/workflow/status/starudream/baidu-su/Docker/master?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue?style=for-the-badge)
 
 ## Config
 
@@ -26,9 +26,9 @@
 
 ## Usage
 
-![Version](https://img.shields.io/docker/v/starudream/baidu-su)
-![Size](https://img.shields.io/docker/image-size/starudream/baidu-su/latest)
-![Pull](https://img.shields.io/docker/pulls/starudream/baidu-su)
+![Version](https://img.shields.io/docker/v/starudream/baidu-su?style=for-the-badge)
+![Size](https://img.shields.io/docker/image-size/starudream/baidu-su/latest?style=for-the-badge)
+![Pull](https://img.shields.io/docker/pulls/starudream/baidu-su?style=for-the-badge)
 
 ```bash
 docker pull starudream/baidu-su
