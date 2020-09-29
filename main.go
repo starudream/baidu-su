@@ -6,7 +6,6 @@ import (
 	"flag"
 	"io/ioutil"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/go-sdk/logx"
@@ -21,6 +20,9 @@ type Config struct {
 	Cron      string `json:"cron"`
 	Timezone  string `json:"timezone"`
 	Certs     []Cert `json:"certs"`
+
+	Path string `json:"-"`
+	Help bool   `json:"-"`
 }
 
 type Cert struct {
@@ -40,48 +42,46 @@ type RespCertInfo struct {
 }
 
 var (
-	config = Config{}
-
-	c string
-	d bool
+	config = &Config{}
 
 	location *time.Location
 	schedule cron.Schedule
 )
 
 func init() {
-	flag.StringVar(&c, "config", "config.json", "config")
-	flag.BoolVar(&d, "debug", strings.ToLower(os.Getenv("DEBUG")) == "true", "debug")
+	flag.StringVar(&config.Path, "config", "config.json", "config")
+	flag.BoolVar(&config.Help, "help", false, "instructions for use")
 	flag.Parse()
 
-	if !d {
-		logx.SetLevel(logx.InfoLevel)
+	if config.Help {
+		flag.Usage()
+		os.Exit(0)
 	}
 
-	bs, err := ioutil.ReadFile(c)
+	bs, err := ioutil.ReadFile(config.Path)
 	if err != nil {
-		exit("[init] read file fail", err)
+		logx.WithField("err", err).Fatal("[init] read file fail")
 	}
 
-	err = json.Unmarshal(bs, &config)
+	err = json.Unmarshal(bs, config)
 	if err != nil {
-		exit("[init] decode file fail", err)
+		logx.WithField("err", err).Fatal("[init] decode file fail")
 	}
+
+	logx.Infof("[config] %s", json.MustMarshal(config))
 
 	location, err = time.LoadLocation(config.Timezone)
 	if err != nil {
-		exit("[init] timezone parse fail", err)
+		logx.WithField("err", err).Fatal("[init] timezone parse fail")
 	}
 	schedule, err = cron.ParseStandard(config.Cron)
 	if err != nil {
-		exit("[init] cron parse fail", err)
+		logx.WithField("err", err).Fatal("[init] cron parse fail")
 	}
 
 	if (config.AccessKey == "" || config.SecretKey == "") && config.BDUSS == "" {
-		exit("[init] access or secret key and bduss is empty", err)
+		logx.Fatal("[config] access or secret key and bduss is empty")
 	}
-
-	logx.Debugf("[init] config: %s", json.MustMarshal(config))
 }
 
 func main() {
@@ -104,19 +104,19 @@ func do(i int) {
 
 	bsCrt, err := ioutil.ReadFile(cert.CrtPath)
 	if err != nil {
-		exit("[%s:%d] read cert file fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] read cert file fail", cert.Name, i)
 		return
 	}
 
 	certBlock, _ := pem.Decode(bsCrt)
 	if certBlock == nil {
-		exit("[%s:%d] check cert format fail", nil, cert.Name, i)
+		logx.Errorf("[%s:%d] check cert format fail", cert.Name, i)
 		return
 	}
 
 	c, err := x509.ParseCertificate(certBlock.Bytes)
 	if err != nil {
-		exit("[%s:%d] decode cert file fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] decode cert file fail", cert.Name, i)
 		return
 	}
 
@@ -127,27 +127,28 @@ func do(i int) {
 
 	bsKey, err := ioutil.ReadFile(cert.KeyPath)
 	if err != nil {
-		exit("[%s:%d] read key file fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] read key file fail", cert.Name, i)
 		return
 	}
 
 	err = client().Init()
 	if err != nil {
-		exit("[%s:%d] client init fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] client init fail", cert.Name, i)
+		return
 	}
 
 	logx.Infof("[%s:%d] cert check", cert.Name, i)
 
 	resp, err := client().GetCertificates(cert.Domain)
 	if err != nil {
-		exit("[%s:%d] api call fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] api call fail", cert.Name, i)
 		return
 	}
 
 	certInfos := []*RespCertInfo{}
 	err = json.Unmarshal(json.MustMarshal(resp.Result), &certInfos)
 	if err != nil {
-		exit("[%s:%d] decode cert info fail", err, cert.Name, i)
+		logx.WithField("err", err).Errorf("[%s:%d] decode cert info fail", cert.Name, i)
 		return
 	}
 
@@ -178,7 +179,7 @@ func do(i int) {
 		if exist {
 			resp, err = client().DeleteCertificates(cert.Domain, id, cert.Name)
 			if err != nil {
-				exit("[%s:%d] api call fail", err, cert.Name, i)
+				logx.WithField("err", err).Errorf("[%s:%d] api call fail", cert.Name, i)
 				return
 			}
 			logx.Infof("[%s:%d] cert deleted", cert.Name, i)
@@ -186,7 +187,7 @@ func do(i int) {
 
 		resp, err = client().PostCertificates(cert.Domain, cert.Name, string(bsCrt), string(bsKey))
 		if err != nil {
-			exit("[%s:%d] api call fail", err, cert.Name, i)
+			logx.WithField("err", err).Errorf("[%s:%d] api call fail", cert.Name, i)
 			return
 		}
 		logx.Infof("[%s:%d] cert added", cert.Name, i)

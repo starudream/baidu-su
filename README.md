@@ -38,7 +38,6 @@ docker pull starudream/baidu-su
 docker run -d \
     --name baidu-su \
     --restart always \
-    -e DEBUG=true \
     -v /opt/docker/baidu-su/config.json:/config.json \
     -v /usr/local/openresty/nginx/conf/ssl:/ssl:ro \
     starudream/baidu-su:latest
