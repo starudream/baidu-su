@@ -155,7 +155,7 @@ func do(i int) {
 	renew, exist, id := false, false, ""
 	for _, info := range certInfos {
 		if info.Info == cert.Name {
-			exist = true
+			exist, id = true, info.Id
 			logx.Infof(
 				"[%s:%d] baidu su cert info: %s(%s) {%s}-{%s}",
 				cert.Name, i, info.HostsContent, info.Issuer, info.StartsOn, info.ExpiresOn,
