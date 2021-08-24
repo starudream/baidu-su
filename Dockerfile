@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN CGO_ENABLED=0 GO111MODULE=on go build -o baidu-su . && upx baidu-su
+RUN CGO_ENABLED=0 GO111MODULE=on go build -o baidu-su .
 
 FROM starudream/alpine-glibc:latest
 
