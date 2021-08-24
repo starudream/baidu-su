@@ -6,7 +6,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GO111MODULE=on go build -o baidu-su .
 
-RUN upx version && upx baidu-su
+RUN upx -V && upx baidu-su
 
 FROM starudream/alpine-glibc:latest
 
