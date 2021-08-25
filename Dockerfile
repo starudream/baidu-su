@@ -4,8 +4,6 @@ WORKDIR /build
 
 COPY . .
 
-RUN docker run arm64v8/alpine sh -c "/proc/1/exe --version"
-
 RUN CGO_ENABLED=0 GO111MODULE=on go build -o baidu-su .
 
 FROM starudream/alpine-glibc:latest
