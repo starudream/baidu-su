@@ -1,6 +1,6 @@
 # Baidu-Su
 
-![Go](https://img.shields.io/github/workflow/status/starudream/baidu-su/Go/master?style=for-the-badge)
+![Golang](https://img.shields.io/github/workflow/status/starudream/baidu-su/Golang/master?style=for-the-badge)
 ![Docker](https://img.shields.io/github/workflow/status/starudream/baidu-su/Docker/master?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue?style=for-the-badge)
 
@@ -8,19 +8,18 @@
 
 ```json
 {
-  "access_key": "xxx",
-  "secret_key": "xxx",
-  "bduss": "xxx",
-  "cron": "* 4 * * *",
-  "timezone": "Asia/Shanghai",
-  "certs": [
-    {
-      "domain": "52xckl.cn",
-      "name": "52xckl.cn",
-      "crt_path": "/ssl/*.52xckl.cn.crt",
-      "key_path": "/ssl/*.52xckl.cn.key"
-    }
-  ]
+    "access_key": "",
+    "secret_key": "",
+    "bduss": "",
+    "cron": "* * 4 * * *",
+    "certs": [
+        {
+            "domain": "",
+            "name": "",
+            "crt_path": "",
+            "key_path": ""
+        }
+    ]
 }
 ```
 

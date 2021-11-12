@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-sdk/logx"
-	"github.com/go-sdk/utilx/json"
+	"github.com/go-sdk/lib/codec/json"
+	"github.com/go-sdk/lib/log"
 )
 
 type ClientRaw struct {
@@ -66,8 +66,8 @@ func (c *ClientRaw) AddParams(kv ...string) *ClientRaw {
 
 func (c *ClientRaw) Do() (*Response, error) {
 	m := c.method
-	if c.method == MethodDelete {
-		m = MethodPost
+	if c.method == http.MethodDelete {
+		m = http.MethodPost
 	}
 
 	u := URLRaw + fmt.Sprintf("seed_%d", time.Now().UnixNano()/1e6) + "/" + c.path
@@ -79,7 +79,7 @@ func (c *ClientRaw) Do() (*Response, error) {
 
 	req.AddCookie(&http.Cookie{Name: "BDUSS", Value: c.bduss})
 	req.Header.Set("referer", "https://su.baidu.com/console/index.html")
-	if c.method == MethodDelete {
+	if c.method == http.MethodDelete {
 		req.Header.Set("x-http-method-override", "DELETE")
 	}
 
@@ -96,7 +96,7 @@ func (c *ClientRaw) Do() (*Response, error) {
 		return nil, fmt.Errorf("read response fail: %v", err)
 	}
 
-	logx.Debugf("[baidusu] method: %s, url: %s, req: %s, code: %d, resp: %s", m, u, json.MustMarshal(c.params), resp.StatusCode, RebuildResponse(bs))
+	log.Debugf("[baidusu] method: %s, url: %s, req: %s, code: %d, resp: %s", m, u, json.MustMarshal(c.params), resp.StatusCode, RebuildResponse(bs))
 
 	data := &Response{}
 	err = json.Unmarshal(bs, data)
@@ -119,7 +119,7 @@ func (c *ClientRaw) Init() error {
 		return err
 	}
 
-	zoneInfos := []ZoneRaw{}
+	var zoneInfos []ZoneRaw
 	err = json.Unmarshal(json.MustMarshal(resp.Result), &zoneInfos)
 	if err != nil {
 		return fmt.Errorf("decode zones fail: %v", err)
@@ -132,7 +132,7 @@ func (c *ClientRaw) Init() error {
 }
 
 func (c *ClientRaw) GetZones(_ string) (*Response, error) {
-	return c.SetMethod(MethodGet).SetPath("api/su/zones?page=1&per_page=100").Do()
+	return c.SetMethod(http.MethodGet).SetPath("api/su/zones?page=1&per_page=100").Do()
 }
 
 func (c *ClientRaw) GetCertificates(domain string) (*Response, error) {
@@ -140,7 +140,7 @@ func (c *ClientRaw) GetCertificates(domain string) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.SetMethod(MethodGet).SetPath("api/su/zones/" + zone + "/custom_certificates?page=1&per_page=100").Do()
+	return c.SetMethod(http.MethodGet).SetPath("api/su/zones/" + zone + "/custom_certificates?page=1&per_page=100").Do()
 }
 
 func (c *ClientRaw) DeleteCertificates(domain, id, _ string) (*Response, error) {
@@ -148,7 +148,7 @@ func (c *ClientRaw) DeleteCertificates(domain, id, _ string) (*Response, error) 
 	if err != nil {
 		return nil, err
 	}
-	return c.SetMethod(MethodDelete).SetPath("api/su/zones/" + zone + "/custom_certificates/" + id).Do()
+	return c.SetMethod(http.MethodDelete).SetPath("api/su/zones/" + zone + "/custom_certificates/" + id).Do()
 }
 
 func (c *ClientRaw) PostCertificates(domain, name, crt, key string) (*Response, error) {
@@ -156,7 +156,7 @@ func (c *ClientRaw) PostCertificates(domain, name, crt, key string) (*Response, 
 	if err != nil {
 		return nil, err
 	}
-	return c.SetMethod(MethodPost).SetPath("api/su/zones/" + zone + "/custom_certificates").SetParams(map[string]string{"info": name, "certificate": crt, "private_key": key}).Do()
+	return c.SetMethod(http.MethodPost).SetPath("api/su/zones/" + zone + "/custom_certificates").SetParams(map[string]string{"info": name, "certificate": crt, "private_key": key}).Do()
 }
 
 func (c *ClientRaw) getZoneId(name string) (string, error) {

@@ -13,8 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-sdk/logx"
-	"github.com/go-sdk/utilx/json"
+	"github.com/go-sdk/lib/codec/json"
+	"github.com/go-sdk/lib/crypto"
+	"github.com/go-sdk/lib/log"
 )
 
 type ClientApi struct {
@@ -74,7 +75,7 @@ func (c *ClientApi) AddParams(kv ...string) *ClientApi {
 func (c *ClientApi) Do() (*Response, error) {
 	c.headers = map[string]string{
 		"X-Auth-Access-Key":       c.accessKey,
-		"X-Auth-Nonce":            nonce(24),
+		"X-Auth-Nonce":            crypto.RandString(24, crypto.CharsetLetterLower),
 		"X-Auth-Path-Info":        c.path,
 		"X-Auth-Signature-Method": SignatureMethod,
 		"X-Auth-Timestamp":        strconv.FormatInt(time.Now().Unix(), 10),
@@ -104,7 +105,7 @@ func (c *ClientApi) Do() (*Response, error) {
 		return nil, fmt.Errorf("read response fail: %v", err)
 	}
 
-	logx.Debugf("[baidusu] method: %s, url: %s, req: %s, code: %d, resp: %s", c.method, URLApi+c.path, json.MustMarshal(c.params), resp.StatusCode, RebuildResponse(bs))
+	log.Debugf("[baidusu] method: %s, url: %s, req: %s, code: %d, resp: %s", c.method, URLApi+c.path, json.MustMarshal(c.params), resp.StatusCode, RebuildResponse(bs))
 
 	data := &Response{}
 	err = json.Unmarshal(bs, data)
@@ -126,15 +127,15 @@ func (c *ClientApi) Init() error {
 }
 
 func (c *ClientApi) GetCertificates(domain string) (*Response, error) {
-	return c.SetMethod(MethodGet).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain}).Do()
+	return c.SetMethod(http.MethodGet).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain}).Do()
 }
 
 func (c *ClientApi) DeleteCertificates(domain, _, name string) (*Response, error) {
-	return c.SetMethod(MethodDelete).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain, "info": name}).Do()
+	return c.SetMethod(http.MethodDelete).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain, "info": name}).Do()
 }
 
 func (c *ClientApi) PostCertificates(domain, name, crt, key string) (*Response, error) {
-	return c.SetMethod(MethodPost).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain, "info": name, "certificate": crt, "private_key": key}).Do()
+	return c.SetMethod(http.MethodPost).SetPath("v3/yjs/custom_certificates").SetParams(map[string]string{"domain": domain, "info": name, "certificate": crt, "private_key": key}).Do()
 }
 
 func (c *ClientApi) build(m map[string]string) string {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-sdk/utilx/json"
+	"github.com/go-sdk/lib/codec/json"
 )
 
 type Client interface {

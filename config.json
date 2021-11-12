@@ -2,8 +2,7 @@
     "access_key": "",
     "secret_key": "",
     "bduss": "",
-    "cron": "* 4 * * *",
-    "timezone": "Asia/Shanghai",
+    "cron": "* * 4 * * *",
     "certs": [
         {
             "domain": "",
