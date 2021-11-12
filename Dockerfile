@@ -4,7 +4,9 @@ WORKDIR /build
 
 COPY . .
 
-RUN apk add --no-cache make && make build && make upx
+RUN apk add --no-cache make git \
+    && make build \
+    && make upx
 
 FROM starudream/alpine-glibc:latest
 
