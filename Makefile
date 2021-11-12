@@ -1,6 +1,6 @@
 GO 	    ?= GO111MODULE=on go
-VERSION ?= latest
-GITHASH ?= -
+VERSION ?= $(shell git describe --exact-match --tags HEAD 2>/dev/null || echo "latest")
+GITHASH ?= $(shell git rev-parse --short HEAD)
 
 LDFLAGS := -s -w
 LDFLAGS += -X "github.com/go-sdk/lib/app.VERSION=$(VERSION)"
