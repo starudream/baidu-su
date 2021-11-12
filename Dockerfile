@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN apk add --no-cache alpine-sdk && make bin && make upx
+RUN apk add --no-cache make && make build && make upx
 
 FROM starudream/alpine-glibc:latest
 
