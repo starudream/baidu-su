@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
 
 	"github.com/go-sdk/lib/app"
+	"github.com/go-sdk/lib/log"
 )
 
 var (

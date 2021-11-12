@@ -16,7 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Init Env
-        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        run: |
+          echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+          echo "GITHASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "VERSION=$GITHUB_REF_NAME" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
