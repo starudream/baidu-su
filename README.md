@@ -42,6 +42,21 @@ docker run -d \
     starudream/baidu-su:latest
 ```
 
+```json
+{
+    "bduss": "xxx",
+    "cron": "0 0 1 * * 1",
+    "certs": [
+        {
+            "domain": "52xckl.cn",
+            "name": "52xckl.cn",
+            "crt_path": "/ssl/52xckl.cn.crt",
+            "key_path": "/ssl/52xckl.cn.key"
+        }
+    ]
+}
+```
+
 ## License
 
 [Apache License 2.0](./LICENSE)
